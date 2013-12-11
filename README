@@ -1,0 +1,18 @@
+TODO
+- the derivation of exponentiations is far too simple, there will probably be examples where it will fail
+
+- when theres derivation, there should also be antiderivation/integration
+
+- putting parentheses around termparts where appropriate would enhance readability of the toString method
+
+- a toString method that creates latex code would be great
+
+- a reduction function that could
+	- group divisions with common divisors
+	- solve parts without variables
+
+- a parser for plaintext inputs (that crashes for ambiguous input)
+
+
+
+- and dont forget to test everything
