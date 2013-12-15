@@ -1,4 +1,6 @@
 TODO
+next feature should be a method, that draws a tree for the term to console, this would be very useful for debugging
+
 - the derivation of exponentiations is far too simple, there will probably be examples where it will fail
 
 - when theres derivation, there should also be antiderivation/integration
