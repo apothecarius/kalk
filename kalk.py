@@ -9,6 +9,12 @@ class _Term:
 		return ""
 	def derive(self,var):
 		assert(isinstance(var,Variable))
+	def makeTree(self):
+		retu = self._makeTree("")
+		assert(type(retu) == str)
+		return retu
+	def _makeTree(self,prefix):
+		return ""
 
 class _UnaryTerm(_Term):
 	def __init__(self,arg):
@@ -19,6 +25,11 @@ class _UnaryTerm(_Term):
 		return self._operatorSign + str(self.mid)
 	def reduce(self):
 		return self.mid.reduce()
+	def _makeTree(self,prefix):
+		retu = self._operatorSign
+		retu += self.mid._makeTree(prefix+" ")
+		assert(type(retu) == str)
+		return retu
 
 #lhs: left  hand side argument
 #rhs: right hand side argument
@@ -36,11 +47,14 @@ class _BinaryTerm(_Term):
 		assert(nl != None)
 		nr = self.rhs.reduce()
 		assert(nr != None)
-		#if(isinstance(nl,Constant) and
-		#	isinstance(nr,Constant)):
-		#	return Constant(self.solve(None))
-		#else:
 		return (nl,nr)
+	def _makeTree(self,prefix):
+		left = self._operatorSign
+		left += self.lhs._makeTree(prefix+"┃")
+		right = prefix + "┖"
+		right += self.rhs._makeTree(prefix+" ")
+		return left + "\n" + right
+
 
 
 
@@ -56,6 +70,8 @@ class Constant(_Term):
 		return Constant(0)
 	def reduce(self):
 		return Constant(self.val)
+	def _makeTree(self,depth):
+		return str(self.val)
 
 class Variable(_Term):
 	def __init__(self,n):
@@ -74,6 +90,8 @@ class Variable(_Term):
 			return Constant(0)
 	def reduce(self):
 		return self
+	def _makeTree(self,depth):
+		return self.name
 
 
 
@@ -91,6 +109,31 @@ class NegationTerm(_UnaryTerm):
 			return Constant(-retu.val)
 		else:
 			return retu
+
+class AbsoluteTerm(_UnaryTerm):
+	def __init__(self,c):
+		assert(isinstance(c,_Term))
+		_UnaryTerm.__init__(self,c)
+		self._operatorSign = "abs"
+	def solve(self,solvents):
+		return abs( self.mid.solve(solvents))
+	def __str__(self):
+		return "|"+str(self.mid)+"|"
+	def derive(self,var):
+		return AbsoluteTerm(self.mid.derive(var))
+	def reduce(self):
+		retu = super(AbsoluteTerm,self).reduce()
+		if(isinstance(retu,AbsoluteTerm) or
+			isinstance(retu,NegationTerm)):
+			return AbsoluteTerm(retu.mid)
+		elif(isinstance(retu,Constant) and
+				retu.val < 0):
+			return Constant(retu.val*(-1))
+		else:
+			return AbsoluteTerm(retu)
+	def _makeTree(self,prefix):
+		return "|"+self.mid._makeTree(prefix+" ")+"|"
+
 
 class AdditionTerm(_BinaryTerm):
 	def __init__(self,lhs,rhs):
@@ -205,31 +248,42 @@ class ExponentTerm(_BinaryTerm):
 		return self
 
 
-
-
 x = Variable("x")
+
+
 
 expo = ExponentTerm(x,Constant(5))
 expoR = expo.reduce()
 nega = NegationTerm(Constant(2))
 negaR = nega.reduce()
 
+abi = AbsoluteTerm(nega)
 
 
-muli = MultiplicationTerm(nega,expo)
+
+
+
+muli = MultiplicationTerm(expo,nega) # -2 * x**5
+#print(muli)
+#print(muli.makeTree())
+
+
 #print(muli)
 muliR = muli.reduce()
 #print(muliR)
 
 myTerm = AdditionTerm(muli,x)
 print("Term: "+str(myTerm))
+print(myTerm.makeTree())
+print()
 reduction = myTerm.reduce()
-print ("Redu: "+str(reduction))
+#print ("Redu: "+str(reduction))
 #print(myTerm.solve({x:5}))
 derivation = myTerm.derive(x)
 print("Deriv: "+str(derivation))
+print(derivation.makeTree())
 reduced_derivation = derivation.reduce()
-print("Reduced Derivate: "+str(reduced_derivation))
+#print("Reduced Derivate: "+str(reduced_derivation))
 
 x5 = {x:5}
 print(myTerm.solve(x5))
