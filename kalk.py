@@ -132,7 +132,7 @@ class AbsoluteTerm(_UnaryTerm):
 		else:
 			return AbsoluteTerm(retu)
 	def _makeTree(self,prefix):
-		return "|"+self.mid._makeTree(prefix+" ")+"|"
+		return "|"+self.mid._makeTree(prefix+"|")
 
 
 class AdditionTerm(_BinaryTerm):
@@ -257,15 +257,16 @@ expoR = expo.reduce()
 nega = NegationTerm(Constant(2))
 negaR = nega.reduce()
 
-abi = AbsoluteTerm(nega)
+
+abi = AbsoluteTerm(AdditionTerm(expo,nega))
+
+#print(abi.makeTree())
 
 
-
-
-
-muli = MultiplicationTerm(expo,nega) # -2 * x**5
+muli = MultiplicationTerm(abi,nega) # -2 * x**5
 #print(muli)
 #print(muli.makeTree())
+
 
 
 #print(muli)
@@ -273,17 +274,15 @@ muliR = muli.reduce()
 #print(muliR)
 
 myTerm = AdditionTerm(muli,x)
-print("Term: "+str(myTerm))
-print(myTerm.makeTree())
-print()
 reduction = myTerm.reduce()
 #print ("Redu: "+str(reduction))
 #print(myTerm.solve({x:5}))
 derivation = myTerm.derive(x)
-print("Deriv: "+str(derivation))
-print(derivation.makeTree())
 reduced_derivation = derivation.reduce()
 #print("Reduced Derivate: "+str(reduced_derivation))
+
+print(myTerm)
+print(myTerm.makeTree())
 
 x5 = {x:5}
 print(myTerm.solve(x5))
