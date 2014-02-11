@@ -109,6 +109,9 @@ class NegationTerm(_UnaryTerm):
 			return Constant(-retu.val)
 		else:
 			return retu
+	def _makeTree(self,prefix):
+		retu = " " + super(NegationTerm,self)._makeTree(prefix+" ")
+		return retu
 
 class AbsoluteTerm(_UnaryTerm):
 	def __init__(self,c):
@@ -248,42 +251,3 @@ class ExponentTerm(_BinaryTerm):
 		return self
 
 
-x = Variable("x")
-
-
-
-expo = ExponentTerm(x,Constant(5))
-expoR = expo.reduce()
-nega = NegationTerm(Constant(2))
-negaR = nega.reduce()
-
-
-abi = AbsoluteTerm(AdditionTerm(expo,nega))
-
-#print(abi.makeTree())
-
-
-muli = MultiplicationTerm(abi,nega) # -2 * x**5
-#print(muli)
-#print(muli.makeTree())
-
-
-
-#print(muli)
-muliR = muli.reduce()
-#print(muliR)
-
-myTerm = AdditionTerm(muli,x)
-reduction = myTerm.reduce()
-#print ("Redu: "+str(reduction))
-#print(myTerm.solve({x:5}))
-derivation = myTerm.derive(x)
-reduced_derivation = derivation.reduce()
-#print("Reduced Derivate: "+str(reduced_derivation))
-
-print(myTerm)
-print(myTerm.makeTree())
-
-x5 = {x:5}
-print(myTerm.solve(x5))
-print(reduction.solve(x5))
